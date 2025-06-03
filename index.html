@@ -437,21 +437,17 @@
         function deleteCaption(captionId) {
             console.log('Delete function called for ID:', captionId); // Debug line
             
-            // Confirm deletion
-            if (confirm('Are you sure you want to permanently delete this caption?')) {
-                const captionItem = document.querySelector(`div[data-id="${captionId}"]`);
-                console.log('Found element:', captionItem); // Debug line
+            const captionItem = document.querySelector(`div[data-id="${captionId}"]`);
+            console.log('Found element:', captionItem); // Debug line
+            
+            if (captionItem) {
+                captionItem.remove();
+                console.log('Caption removed'); // Debug line
                 
-                if (captionItem) {
-                    captionItem.remove();
-                    console.log('Caption removed'); // Debug line
-                    
-                    // Check if no captions left
-                    checkEmptyState();
-                } else {
-                    console.log('Caption element not found'); // Debug line
-                    alert('Error: Could not find caption to delete');
-                }
+                // Check if no captions left
+                checkEmptyState();
+            } else {
+                console.log('Caption element not found'); // Debug line
             }
         }
         
@@ -495,19 +491,16 @@
         function deleteUsedCaption(captionId) {
             console.log('Delete used function called for ID:', captionId); // Debug line
             
-            if (confirm('Are you sure you want to permanently delete this used caption?')) {
-                // Remove from used captions array
-                const usedIndex = usedCaptions.findIndex(caption => caption.id == captionId);
-                console.log('Found used caption at index:', usedIndex); // Debug line
-                
-                if (usedIndex !== -1) {
-                    usedCaptions.splice(usedIndex, 1);
-                    updateUsedCaptionsDisplay();
-                    console.log('Used caption deleted'); // Debug line
-                } else {
-                    console.log('Used caption not found in array'); // Debug line
-                    alert('Error: Could not find used caption to delete');
-                }
+            // Remove from used captions array
+            const usedIndex = usedCaptions.findIndex(caption => caption.id == captionId);
+            console.log('Found used caption at index:', usedIndex); // Debug line
+            
+            if (usedIndex !== -1) {
+                usedCaptions.splice(usedIndex, 1);
+                updateUsedCaptionsDisplay();
+                console.log('Used caption deleted'); // Debug line
+            } else {
+                console.log('Used caption not found in array'); // Debug line
             }
         }
         
