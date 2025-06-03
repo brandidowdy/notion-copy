@@ -10,7 +10,8 @@
             margin: 0;
             padding: 20px;
             background: #ffffff;
-            max-width: 700px;
+            max-width: 1000px;
+            width: 100%;
         }
         
         .widget-container {
@@ -89,6 +90,21 @@
             background: #4b5563;
         }
         
+        .delete-button {
+            background: #9ca3af;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            padding: 6px 12px;
+            font-size: 11px;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+        
+        .delete-button:hover {
+            background: #6b7280;
+        }
+        
         .add-section {
             margin-top: 20px;
             padding-top: 20px;
@@ -109,7 +125,7 @@
         }
         
         .add-button {
-            background: #2383e2;
+            background: #f1b476;
             color: white;
             border: none;
             border-radius: 6px;
@@ -121,7 +137,7 @@
         }
         
         .add-button:hover {
-            background: #1a6bb8;
+            background: #e6a05c;
         }
         
         .used-section {
@@ -189,6 +205,7 @@
                 <div class="button-group">
                     <button class="copy-button" onclick="copyCaption(this, 1)">📋 COPY CAPTION</button>
                     <button class="used-button" onclick="markAsUsed(1)">Mark as Used</button>
+                    <button class="delete-button" onclick="deleteCaption(1)">🗑️ Delete</button>
                 </div>
             </div>
             
@@ -197,6 +214,7 @@
                 <div class="button-group">
                     <button class="copy-button" onclick="copyCaption(this, 2)">📋 COPY CAPTION</button>
                     <button class="used-button" onclick="markAsUsed(2)">Mark as Used</button>
+                    <button class="delete-button" onclick="deleteCaption(2)">🗑️ Delete</button>
                 </div>
             </div>
             
@@ -205,6 +223,7 @@
                 <div class="button-group">
                     <button class="copy-button" onclick="copyCaption(this, 3)">📋 COPY CAPTION</button>
                     <button class="used-button" onclick="markAsUsed(3)">Mark as Used</button>
+                    <button class="delete-button" onclick="deleteCaption(3)">🗑️ Delete</button>
                 </div>
             </div>
         </div>
@@ -315,6 +334,7 @@
                 <div class="button-group">
                     <button class="copy-button" onclick="copyCaption(this, ${captionCounter})">📋 COPY CAPTION</button>
                     <button class="used-button" onclick="markAsUsed(${captionCounter})">Mark as Used</button>
+                    <button class="delete-button" onclick="deleteCaption(${captionCounter})">🗑️ Delete</button>
                 </div>
             `;
             
@@ -360,6 +380,17 @@
             } else {
                 usedList.classList.add('visible');
                 toggleText.innerHTML = `📂 Hide Used Captions (<span id="usedCount">${usedCaptions.length}</span>)`;
+            }
+        }
+        
+        function deleteCaption(captionId) {
+            // Confirm deletion
+            if (confirm('Are you sure you want to permanently delete this caption?')) {
+                const captionItem = document.querySelector(`[data-id="${captionId}"]`);
+                captionItem.remove();
+                
+                // Check if no captions left
+                checkEmptyState();
             }
         }
         
