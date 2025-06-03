@@ -179,6 +179,51 @@
             font-size: 13px;
             color: #6b7280;
             line-height: 1.4;
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            gap: 12px;
+        }
+        
+        .used-content {
+            flex: 1;
+        }
+        
+        .used-actions {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            min-width: 100px;
+        }
+        
+        .restore-button {
+            background: #10b981;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            padding: 4px 8px;
+            font-size: 10px;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+        
+        .restore-button:hover {
+            background: #059669;
+        }
+        
+        .delete-used-button {
+            background: #9ca3af;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            padding: 4px 8px;
+            font-size: 10px;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+        
+        .delete-used-button:hover {
+            background: #6b7280;
         }
         
         .used-date {
@@ -363,8 +408,14 @@
                 const usedItem = document.createElement('div');
                 usedItem.className = 'used-caption';
                 usedItem.innerHTML = `
-                    ${caption.text}
-                    <div class="used-date">Used on ${caption.date}</div>
+                    <div class="used-content">
+                        ${caption.text}
+                        <div class="used-date">Used on ${caption.date}</div>
+                    </div>
+                    <div class="used-actions">
+                        <button class="restore-button" onclick="restoreCaption(${caption.id})">↩️ Restore</button>
+                        <button class="delete-used-button" onclick="deleteUsedCaption(${caption.id})">🗑️ Delete</button>
+                    </div>
                 `;
                 usedContainer.appendChild(usedItem);
             });
@@ -387,10 +438,60 @@
             // Confirm deletion
             if (confirm('Are you sure you want to permanently delete this caption?')) {
                 const captionItem = document.querySelector(`[data-id="${captionId}"]`);
-                captionItem.remove();
-                
-                // Check if no captions left
-                checkEmptyState();
+                if (captionItem) {
+                    captionItem.remove();
+                    
+                    // Check if no captions left
+                    checkEmptyState();
+                }
+            }
+        }
+        
+        function restoreCaption(captionId) {
+            // Find the caption in usedCaptions array
+            const usedIndex = usedCaptions.findIndex(caption => caption.id == captionId);
+            if (usedIndex === -1) return;
+            
+            const caption = usedCaptions[usedIndex];
+            
+            // Remove from used captions array
+            usedCaptions.splice(usedIndex, 1);
+            
+            // Create new caption element in available section
+            const captionItem = document.createElement('div');
+            captionItem.className = 'caption-item';
+            captionItem.setAttribute('data-id', captionId);
+            
+            captionItem.innerHTML = `
+                <div class="caption-text">${caption.text}</div>
+                <div class="button-group">
+                    <button class="copy-button" onclick="copyCaption(this, ${captionId})">📋 COPY CAPTION</button>
+                    <button class="used-button" onclick="markAsUsed(${captionId})">Mark as Used</button>
+                    <button class="delete-button" onclick="deleteCaption(${captionId})">🗑️ Delete</button>
+                </div>
+            `;
+            
+            // Add to available captions
+            document.getElementById('availableCaptions').appendChild(captionItem);
+            
+            // Update used captions display
+            updateUsedCaptionsDisplay();
+            
+            // Remove empty state if it exists
+            const emptyState = document.querySelector('.empty-state');
+            if (emptyState) {
+                emptyState.remove();
+            }
+        }
+        
+        function deleteUsedCaption(captionId) {
+            if (confirm('Are you sure you want to permanently delete this used caption?')) {
+                // Remove from used captions array
+                const usedIndex = usedCaptions.findIndex(caption => caption.id == captionId);
+                if (usedIndex !== -1) {
+                    usedCaptions.splice(usedIndex, 1);
+                    updateUsedCaptionsDisplay();
+                }
             }
         }
         
