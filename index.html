@@ -288,11 +288,22 @@
                 <!-- Used captions will appear here -->
             </div>
         </div>
+        
+        <div class="used-section">
+            <button class="toggle-used" onclick="toggleDeletedCaptions()">
+                <span id="toggleDeletedText">🗑️ Show Deleted Captions (<span id="deletedCount">0</span>)</span>
+            </button>
+            
+            <div class="used-list" id="deletedCaptions">
+                <!-- Deleted captions will appear here -->
+            </div>
+        </div>
     </div>
 
     <script>
         let captionCounter = 4; // Start from 4 since we have 3 sample captions
         let usedCaptions = [];
+        let deletedCaptions = [];
         
         async function copyCaption(button, captionId) {
             const captionItem = document.querySelector(`[data-id="${captionId}"]`);
@@ -441,13 +452,111 @@
             console.log('Found element:', captionItem); // Debug line
             
             if (captionItem) {
+                const captionText = captionItem.querySelector('.caption-text').textContent;
+                
+                // Add to deleted captions with timestamp
+                const deletedCaption = {
+                    id: captionId,
+                    text: captionText,
+                    date: new Date().toLocaleDateString()
+                };
+                
+                deletedCaptions.push(deletedCaption);
+                
+                // Remove from available captions
                 captionItem.remove();
-                console.log('Caption removed'); // Debug line
+                console.log('Caption moved to deleted'); // Debug line
+                
+                // Update deleted captions display
+                updateDeletedCaptionsDisplay();
                 
                 // Check if no captions left
                 checkEmptyState();
             } else {
                 console.log('Caption element not found'); // Debug line
+            }
+        }
+        
+        function restoreDeletedCaption(captionId) {
+            // Find the caption in deletedCaptions array
+            const deletedIndex = deletedCaptions.findIndex(caption => caption.id == captionId);
+            if (deletedIndex === -1) return;
+            
+            const caption = deletedCaptions[deletedIndex];
+            
+            // Remove from deleted captions array
+            deletedCaptions.splice(deletedIndex, 1);
+            
+            // Create new caption element in available section
+            const captionItem = document.createElement('div');
+            captionItem.className = 'caption-item';
+            captionItem.setAttribute('data-id', captionId);
+            
+            captionItem.innerHTML = `
+                <div class="caption-text">${caption.text}</div>
+                <div class="button-group">
+                    <button class="copy-button" onclick="copyCaption(this, ${captionId})">📋 COPY CAPTION</button>
+                    <button class="used-button" onclick="markAsUsed(${captionId})">Mark as Used</button>
+                    <button class="delete-button" onclick="deleteCaption(${captionId})">🗑️ Delete</button>
+                </div>
+            `;
+            
+            // Add to available captions
+            document.getElementById('availableCaptions').appendChild(captionItem);
+            
+            // Update deleted captions display
+            updateDeletedCaptionsDisplay();
+            
+            // Remove empty state if it exists
+            const emptyState = document.querySelector('.empty-state');
+            if (emptyState) {
+                emptyState.remove();
+            }
+        }
+        
+        function permanentlyDeleteCaption(captionId) {
+            // Remove from deleted captions array permanently
+            const deletedIndex = deletedCaptions.findIndex(caption => caption.id == captionId);
+            if (deletedIndex !== -1) {
+                deletedCaptions.splice(deletedIndex, 1);
+                updateDeletedCaptionsDisplay();
+            }
+        }
+        
+        function updateDeletedCaptionsDisplay() {
+            const deletedContainer = document.getElementById('deletedCaptions');
+            const deletedCount = document.getElementById('deletedCount');
+            
+            deletedContainer.innerHTML = '';
+            deletedCount.textContent = deletedCaptions.length;
+            
+            deletedCaptions.forEach(caption => {
+                const deletedItem = document.createElement('div');
+                deletedItem.className = 'used-caption';
+                deletedItem.innerHTML = `
+                    <div class="used-content">
+                        ${caption.text}
+                        <div class="used-date">Deleted on ${caption.date}</div>
+                    </div>
+                    <div class="used-actions">
+                        <button class="restore-button" onclick="restoreDeletedCaption(${caption.id})">↩️ Restore</button>
+                        <button class="delete-used-button" onclick="permanentlyDeleteCaption(${caption.id})">🗑️ Permanent</button>
+                    </div>
+                `;
+                deletedContainer.appendChild(deletedItem);
+            });
+        }
+        
+        function toggleDeletedCaptions() {
+            const deletedList = document.getElementById('deletedCaptions');
+            const toggleDeletedText = document.getElementById('toggleDeletedText');
+            
+            if (deletedList.classList.contains('visible')) {
+                deletedList.classList.remove('visible');
+                toggleDeletedText.innerHTML = `🗑️ Show Deleted Captions (<span id="deletedCount">${deletedCaptions.length}</span>)`;
+            } else {
+                deletedList.classList.add('visible');
+                toggleDeletedText.innerHTML = `🗑️ Hide Deleted Captions (<span id="deletedCount">${deletedCaptions.length}</span>)`;
             }
         }
         
