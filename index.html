@@ -3,33 +3,55 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Copy to Clipboard Widget</title>
+    <title>Caption Copy Widget</title>
     <style>
         body {
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
             margin: 0;
             padding: 20px;
             background: #ffffff;
-            max-width: 600px;
+            max-width: 700px;
         }
         
         .widget-container {
             border: 1px solid #e1e5e9;
             border-radius: 8px;
-            padding: 16px;
+            padding: 20px;
             background: #fafafa;
         }
         
-        .text-content {
+        .section-title {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 16px;
+            color: #333;
+        }
+        
+        .caption-item {
             background: white;
             border: 1px solid #e1e5e9;
-            border-radius: 6px;
-            padding: 12px;
+            border-radius: 8px;
+            padding: 16px;
             margin-bottom: 12px;
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+        }
+        
+        .caption-text {
+            flex: 1;
             font-size: 14px;
             line-height: 1.5;
             white-space: pre-wrap;
             word-wrap: break-word;
+            color: #333;
+        }
+        
+        .button-group {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            min-width: 120px;
         }
         
         .copy-button {
@@ -37,8 +59,8 @@
             color: white;
             border: none;
             border-radius: 6px;
-            padding: 8px 16px;
-            font-size: 14px;
+            padding: 8px 12px;
+            font-size: 12px;
             font-weight: 500;
             cursor: pointer;
             transition: background-color 0.2s;
@@ -48,78 +70,176 @@
             background: #e6689a;
         }
         
-        .copy-button:active {
-            background: #cc5a85;
-        }
-        
         .copy-button.copied {
             background: #0f7b0f;
         }
         
-        .edit-section {
-            margin-top: 16px;
-            padding-top: 16px;
+        .used-button {
+            background: #6b7280;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            padding: 6px 12px;
+            font-size: 11px;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+        
+        .used-button:hover {
+            background: #4b5563;
+        }
+        
+        .add-section {
+            margin-top: 20px;
+            padding-top: 20px;
             border-top: 1px solid #e1e5e9;
         }
         
-        .edit-textarea {
+        .add-textarea {
             width: 100%;
-            min-height: 60px;
-            padding: 8px;
+            min-height: 80px;
+            padding: 12px;
             border: 1px solid #e1e5e9;
             border-radius: 6px;
             font-family: inherit;
             font-size: 14px;
             resize: vertical;
             box-sizing: border-box;
+            margin-bottom: 10px;
         }
         
-        .update-button {
-            margin-top: 8px;
-            background: #6b7280;
+        .add-button {
+            background: #2383e2;
             color: white;
             border: none;
             border-radius: 6px;
-            padding: 6px 12px;
-            font-size: 12px;
+            padding: 10px 16px;
+            font-size: 14px;
+            font-weight: 500;
             cursor: pointer;
+            transition: background-color 0.2s;
         }
         
-        .update-button:hover {
-            background: #4b5563;
+        .add-button:hover {
+            background: #1a6bb8;
+        }
+        
+        .used-section {
+            margin-top: 30px;
+            padding-top: 20px;
+            border-top: 2px solid #e1e5e9;
+        }
+        
+        .toggle-used {
+            background: #f3f4f6;
+            color: #6b7280;
+            border: 1px solid #d1d5db;
+            border-radius: 6px;
+            padding: 8px 16px;
+            font-size: 14px;
+            cursor: pointer;
+            margin-bottom: 16px;
+            transition: all 0.2s;
+        }
+        
+        .toggle-used:hover {
+            background: #e5e7eb;
+        }
+        
+        .used-list {
+            display: none;
+        }
+        
+        .used-list.visible {
+            display: block;
+        }
+        
+        .used-caption {
+            background: #f9f9f9;
+            border: 1px solid #e1e5e9;
+            border-radius: 6px;
+            padding: 12px;
+            margin-bottom: 8px;
+            font-size: 13px;
+            color: #6b7280;
+            line-height: 1.4;
+        }
+        
+        .used-date {
+            font-size: 11px;
+            color: #9ca3af;
+            margin-top: 4px;
+        }
+        
+        .empty-state {
+            text-align: center;
+            color: #9ca3af;
+            font-style: italic;
+            padding: 40px 20px;
         }
     </style>
 </head>
 <body>
     <div class="widget-container">
-        <div class="text-content" id="textContent">Click the button below to copy this text to your clipboard!
-
-You can customize this text by editing it in the text area below and clicking "Update Text".</div>
+        <div class="section-title">📝 Available Captions</div>
         
-        <button class="copy-button" id="copyButton" onclick="copyToClipboard()">
-            📋 COPY CAPTION
-        </button>
+        <div id="availableCaptions">
+            <div class="caption-item" data-id="1">
+                <div class="caption-text">Transform your Monday blues into Monday motivation! ✨ What's one small step you're taking toward your goals today? #MondayMotivation #Goals</div>
+                <div class="button-group">
+                    <button class="copy-button" onclick="copyCaption(this, 1)">📋 COPY CAPTION</button>
+                    <button class="used-button" onclick="markAsUsed(1)">Mark as Used</button>
+                </div>
+            </div>
+            
+            <div class="caption-item" data-id="2">
+                <div class="caption-text">Behind the scenes magic happening! 🎬✨ Sometimes the best moments are the ones you don't see. #BehindTheScenes #Process</div>
+                <div class="button-group">
+                    <button class="copy-button" onclick="copyCaption(this, 2)">📋 COPY CAPTION</button>
+                    <button class="used-button" onclick="markAsUsed(2)">Mark as Used</button>
+                </div>
+            </div>
+            
+            <div class="caption-item" data-id="3">
+                <div class="caption-text">Coffee in hand, dreams in heart ☕️💫 Ready to make today amazing! What fuels your passion? #CoffeeTime #Passion #Dreams</div>
+                <div class="button-group">
+                    <button class="copy-button" onclick="copyCaption(this, 3)">📋 COPY CAPTION</button>
+                    <button class="used-button" onclick="markAsUsed(3)">Mark as Used</button>
+                </div>
+            </div>
+        </div>
         
-        <div class="edit-section">
-            <textarea class="edit-textarea" id="editTextarea" placeholder="Edit your text here...">Click the button below to copy this text to your clipboard!
-
-You can customize this text by editing it in the text area below and clicking "Update Text".</textarea>
-            <br>
-            <button class="update-button" onclick="updateText()">Update Caption</button>
+        <div class="add-section">
+            <div class="section-title">➕ Add New Caption</div>
+            <textarea class="add-textarea" id="newCaptionText" placeholder="Write your new caption here..."></textarea>
+            <button class="add-button" onclick="addNewCaption()">Add Caption</button>
+        </div>
+        
+        <div class="used-section">
+            <button class="toggle-used" onclick="toggleUsedCaptions()">
+                <span id="toggleText">📁 Show Used Captions (<span id="usedCount">0</span>)</span>
+            </button>
+            
+            <div class="used-list" id="usedCaptions">
+                <!-- Used captions will appear here -->
+            </div>
         </div>
     </div>
 
     <script>
-        async function copyToClipboard() {
-            const textContent = document.getElementById('textContent').textContent;
-            const button = document.getElementById('copyButton');
+        let captionCounter = 4; // Start from 4 since we have 3 sample captions
+        let usedCaptions = [];
+        
+        async function copyCaption(button, captionId) {
+            const captionItem = document.querySelector(`[data-id="${captionId}"]`);
+            const textContent = captionItem.querySelector('.caption-text').textContent;
             
             try {
                 await navigator.clipboard.writeText(textContent);
                 
                 // Visual feedback
                 const originalText = button.innerHTML;
-                button.innerHTML = '✅ Copied!';
+                button.innerHTML = '✅ COPIED!';
                 button.classList.add('copied');
                 
                 setTimeout(() => {
@@ -138,7 +258,7 @@ You can customize this text by editing it in the text area below and clicking "U
                 try {
                     document.execCommand('copy');
                     const originalText = button.innerHTML;
-                    button.innerHTML = '✅ Copied!';
+                    button.innerHTML = '✅ COPIED!';
                     button.classList.add('copied');
                     
                     setTimeout(() => {
@@ -153,10 +273,112 @@ You can customize this text by editing it in the text area below and clicking "U
             }
         }
         
-        function updateText() {
-            const newText = document.getElementById('editTextarea').value;
-            document.getElementById('textContent').textContent = newText;
+        function markAsUsed(captionId) {
+            const captionItem = document.querySelector(`[data-id="${captionId}"]`);
+            const captionText = captionItem.querySelector('.caption-text').textContent;
+            
+            // Add to used captions with timestamp
+            const usedCaption = {
+                id: captionId,
+                text: captionText,
+                date: new Date().toLocaleDateString()
+            };
+            
+            usedCaptions.push(usedCaption);
+            
+            // Remove from available captions
+            captionItem.remove();
+            
+            // Update used captions display
+            updateUsedCaptionsDisplay();
+            
+            // Check if no captions left
+            checkEmptyState();
         }
+        
+        function addNewCaption() {
+            const textarea = document.getElementById('newCaptionText');
+            const captionText = textarea.value.trim();
+            
+            if (!captionText) {
+                alert('Please enter a caption first!');
+                return;
+            }
+            
+            // Create new caption element
+            const captionItem = document.createElement('div');
+            captionItem.className = 'caption-item';
+            captionItem.setAttribute('data-id', captionCounter);
+            
+            captionItem.innerHTML = `
+                <div class="caption-text">${captionText}</div>
+                <div class="button-group">
+                    <button class="copy-button" onclick="copyCaption(this, ${captionCounter})">📋 COPY CAPTION</button>
+                    <button class="used-button" onclick="markAsUsed(${captionCounter})">Mark as Used</button>
+                </div>
+            `;
+            
+            // Add to available captions
+            document.getElementById('availableCaptions').appendChild(captionItem);
+            
+            // Clear textarea
+            textarea.value = '';
+            captionCounter++;
+            
+            // Remove empty state if it exists
+            const emptyState = document.querySelector('.empty-state');
+            if (emptyState) {
+                emptyState.remove();
+            }
+        }
+        
+        function updateUsedCaptionsDisplay() {
+            const usedContainer = document.getElementById('usedCaptions');
+            const usedCount = document.getElementById('usedCount');
+            
+            usedContainer.innerHTML = '';
+            usedCount.textContent = usedCaptions.length;
+            
+            usedCaptions.forEach(caption => {
+                const usedItem = document.createElement('div');
+                usedItem.className = 'used-caption';
+                usedItem.innerHTML = `
+                    ${caption.text}
+                    <div class="used-date">Used on ${caption.date}</div>
+                `;
+                usedContainer.appendChild(usedItem);
+            });
+        }
+        
+        function toggleUsedCaptions() {
+            const usedList = document.getElementById('usedCaptions');
+            const toggleText = document.getElementById('toggleText');
+            
+            if (usedList.classList.contains('visible')) {
+                usedList.classList.remove('visible');
+                toggleText.innerHTML = `📁 Show Used Captions (<span id="usedCount">${usedCaptions.length}</span>)`;
+            } else {
+                usedList.classList.add('visible');
+                toggleText.innerHTML = `📂 Hide Used Captions (<span id="usedCount">${usedCaptions.length}</span>)`;
+            }
+        }
+        
+        function checkEmptyState() {
+            const availableContainer = document.getElementById('availableCaptions');
+            if (availableContainer.children.length === 0) {
+                const emptyState = document.createElement('div');
+                emptyState.className = 'empty-state';
+                emptyState.innerHTML = 'No captions available. Add some new ones below! 📝';
+                availableContainer.appendChild(emptyState);
+            }
+        }
+        
+        // Handle Enter key in textarea
+        document.getElementById('newCaptionText').addEventListener('keydown', function(e) {
+            if (e.key === 'Enter' && e.ctrlKey) {
+                addNewCaption();
+            }
+        });
     </script>
 </body>
 </html>
